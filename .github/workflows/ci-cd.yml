@@ -13,10 +13,16 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Docker Image
-        run: docker build -t my-docker-app:latest .
+        run: docker build -t yosrmd/my-docker-app:latest .
 
-      - name: List Docker Images
-        run: docker images
+      - name: List Docker Images (Build Phase)
+        run: docker images  # Cette commande liste les images Docker présentes
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Push Docker Image to Docker Hub
+        run: docker push yosrmd/my-docker-app:latest
 
       - name: Run Container and Execute Tests
         run: echo "Tests passed!"
@@ -32,11 +38,8 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-      - name: List Docker Images (Deploy Job)
-        run: docker images
+      - name: List Docker Images (Deploy Phase)
+        run: docker images  # Cette commande liste les images Docker disponibles dans le job de déploiement
 
-      - name: Tag Docker Image
-        run: docker tag my-docker-app:latest yosrmd/my-docker-app:latest
-
-      - name: Push Docker Image
-        run: docker push yosrmd/my-docker-app:latest
+      - name: Pull Docker Image from Docker Hub
+        run: docker pull yosrmd/my-docker-app:latest  # Récupérer l'image depuis Docker Hub
